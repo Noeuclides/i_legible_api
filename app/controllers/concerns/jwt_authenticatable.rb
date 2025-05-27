@@ -8,7 +8,9 @@ module JwtAuthenticatable
   private
 
   def authenticate_user_from_token!
-    return unless auth_token
+    unless auth_token
+      render json: { error: "Unauthorized" }, status: :unauthorized and return
+    end
 
     payload = JsonWebToken.decode(auth_token)
     if payload.present? && payload[:sub].present?

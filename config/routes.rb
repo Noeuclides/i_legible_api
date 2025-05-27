@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => "/api-docs"
   namespace :api do
     namespace :v1 do
+      resources :word_types
       devise_for :users,
                  path: "",
                  path_names: {
@@ -21,6 +22,8 @@ Rails.application.routes.draw do
       end
 
       resources :vocabulary_entries, except: [ :new, :edit ]
+
+      get "me", to: "base#me"
     end
   end
 end

@@ -117,4 +117,31 @@ RSpec.describe "Authentication API", type: :request do
       end
     end
   end
+
+  path "/api/v1/me" do
+    get "Returns the current user's info" do
+      tags "Authentication"
+      produces "application/json"
+      security [ bearerAuth: [] ]
+
+      response "200", "current user info returned" do
+        let(:user) { create(:user, email: "me@example.com", password: "password123") }
+        let(:Authorization) do
+          post "/api/v1/login", params: { user: { email: user.email, password: "password123" } }
+          response.headers["Authorization"]
+        end
+
+        run_test! do |response|
+          json = JSON.parse(response.body)
+          expect(json["email"]).to eq("me@example.com")
+          expect(json["id"]).to eq(user.id)
+        end
+      end
+
+      response "401", "unauthorized" do
+        let(:Authorization) { nil }
+        run_test!
+      end
+    end
+  end
 end
